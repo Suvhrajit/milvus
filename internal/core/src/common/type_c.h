@@ -89,6 +89,10 @@ typedef struct CStorageConfig {
     bool useIAM;
     bool useVirtualHost;
     int64_t requestTimeoutMs;
+    const char* session_token;
+    const char* kms_key_id;
+    bool byok_enabled;
+    bool useCollectionIdIndexPath;
 } CStorageConfig;
 
 typedef struct CTraceConfig {

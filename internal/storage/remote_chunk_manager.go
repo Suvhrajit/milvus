@@ -49,6 +49,7 @@ const (
 type ObjectStorage interface {
 	GetObject(ctx context.Context, bucketName, objectName string, offset int64, size int64) (FileReader, error)
 	PutObject(ctx context.Context, bucketName, objectName string, reader io.Reader, objectSize int64) error
+	PutObjectWithSseKey(ctx context.Context, bucketName, objectName string, reader io.Reader, objectSize int64, sseKey string) error
 	StatObject(ctx context.Context, bucketName, objectName string) (int64, error)
 	ListObjects(ctx context.Context, bucketName string, prefix string, recursive bool) ([]string, []time.Time, error)
 	RemoveObject(ctx context.Context, bucketName, objectName string) error
@@ -61,6 +62,7 @@ type RemoteChunkManager struct {
 	//	ctx        context.Context
 	bucketName string
 	rootPath   string
+	sseKms     string
 }
 
 var _ ChunkManager = (*RemoteChunkManager)(nil)
@@ -80,6 +82,7 @@ func NewRemoteChunkManager(ctx context.Context, c *config) (*RemoteChunkManager,
 		client:     client,
 		bucketName: c.bucketName,
 		rootPath:   strings.TrimLeft(c.rootPath, "/"),
+		sseKms:     c.sseKms,
 	}
 	log.Info("remote chunk manager init success.", zap.String("remote", c.cloudProvider), zap.String("bucketname", c.bucketName), zap.String("root", mcm.RootPath()))
 	return mcm, nil
@@ -373,7 +376,12 @@ func (mcm *RemoteChunkManager) getObject(ctx context.Context, bucketName, object
 func (mcm *RemoteChunkManager) putObject(ctx context.Context, bucketName, objectName string, reader io.Reader, objectSize int64) error {
 	start := timerecord.NewTimeRecorder("putObject")
 
-	err := mcm.client.PutObject(ctx, bucketName, objectName, reader, objectSize)
+	var err error
+	if len(mcm.sseKms) == 0 {
+		err = mcm.client.PutObject(ctx, bucketName, objectName, reader, objectSize)
+	} else {
+		err = mcm.client.PutObjectWithSseKey(ctx, bucketName, objectName, reader, objectSize, mcm.sseKms)
+	}
 	metrics.PersistentDataOpCounter.WithLabelValues(metrics.DataPutLabel, metrics.TotalLabel).Inc()
 	if err == nil {
 		metrics.PersistentDataRequestLatency.WithLabelValues(metrics.DataPutLabel).Observe(float64(start.ElapseSpan().Milliseconds()))

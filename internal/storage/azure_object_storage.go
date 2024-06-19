@@ -189,6 +189,11 @@ func (AzureObjectStorage *AzureObjectStorage) PutObject(ctx context.Context, buc
 	return err
 }
 
+func (AzureObjectStorage AzureObjectStorage) PutObjectWithSseKey(ctx context.Context, bucketName, objectName string, reader io.Reader, objectSize int64, sseKey string) error {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (AzureObjectStorage *AzureObjectStorage) StatObject(ctx context.Context, bucketName, objectName string) (int64, error) {
 	info, err := AzureObjectStorage.Client.NewContainerClient(bucketName).NewBlockBlobClient(objectName).GetProperties(ctx, &blob.GetPropertiesOptions{})
 	if err != nil {

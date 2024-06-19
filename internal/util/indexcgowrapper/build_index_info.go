@@ -52,6 +52,8 @@ func NewBuildIndexInfo(config *indexpb.StorageConfig) (*BuildIndexInfo, error) {
 	cIamEndPoint := C.CString(config.IAMEndpoint)
 	cRegion := C.CString(config.Region)
 	cSslCACert := C.CString(config.SslCACert)
+	cSessionToken := C.CString(config.SessionToken)
+	cKmsKeyId := C.CString(config.KmsKeyId)
 	defer C.free(unsafe.Pointer(cAddress))
 	defer C.free(unsafe.Pointer(cBucketName))
 	defer C.free(unsafe.Pointer(cAccessKey))
@@ -62,6 +64,8 @@ func NewBuildIndexInfo(config *indexpb.StorageConfig) (*BuildIndexInfo, error) {
 	defer C.free(unsafe.Pointer(cIamEndPoint))
 	defer C.free(unsafe.Pointer(cRegion))
 	defer C.free(unsafe.Pointer(cSslCACert))
+	defer C.free(unsafe.Pointer(cSessionToken))
+	defer C.free(unsafe.Pointer(cKmsKeyId))
 	storageConfig := C.CStorageConfig{
 		address:          cAddress,
 		bucket_name:      cBucketName,
@@ -77,6 +81,10 @@ func NewBuildIndexInfo(config *indexpb.StorageConfig) (*BuildIndexInfo, error) {
 		region:           cRegion,
 		useVirtualHost:   C.bool(config.UseVirtualHost),
 		requestTimeoutMs: C.int64_t(config.RequestTimeoutMs),
+		session_token:    cSessionToken,
+		kms_key_id:       cKmsKeyId,
+		byok_enabled:     C.bool(config.ByokEnabled),
+		useCollectionIdIndexPath: C.bool(config.UseCollectionIdIndexPath),
 	}
 
 	status := C.NewBuildIndexInfo(&cBuildIndexInfo, storageConfig)

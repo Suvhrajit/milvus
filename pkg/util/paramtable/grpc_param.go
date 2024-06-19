@@ -267,8 +267,9 @@ func (p *GrpcClientConfig) Init(domain string, base *BaseTable) {
 
 	dialTimeout := strconv.FormatInt(DefaultDialTimeout, 10)
 	p.DialTimeout = ParamItem{
-		Key:     "grpc.client.dialTimeout",
-		Version: "2.0.0",
+		Key:          p.Domain + "grpc.client.dialTimeout",
+		Version:      "2.0.0",
+		FallbackKeys: []string{"grpc.client.dialTimeout"},
 		Formatter: func(v string) string {
 			if v == "" {
 				return dialTimeout

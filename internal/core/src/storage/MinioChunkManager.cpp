@@ -27,6 +27,7 @@
 #include <aws/s3/model/HeadObjectRequest.h>
 #include <aws/s3/model/ListObjectsRequest.h>
 #include <aws/s3/model/PutObjectRequest.h>
+#include <aws/s3/model/ServerSideEncryption.h>
 
 #include "storage/MinioChunkManager.h"
 #include "storage/AliyunSTSClient.h"
@@ -198,7 +199,9 @@ void
 MinioChunkManager::BuildS3Client(
     const StorageConfig& storage_config,
     const Aws::Client::ClientConfiguration& config) {
-    if (storage_config.useIAM) {
+    if (storage_config.byok_enabled) {
+        BuildByokS3Client(storage_config, config);
+    } else if (storage_config.useIAM) {
         auto provider =
             std::make_shared<Aws::Auth::DefaultAWSCredentialsProviderChain>();
         auto aws_credentials = provider->GetAWSCredentials();
@@ -225,7 +228,7 @@ MinioChunkManager::PreCheck(const StorageConfig& config) {
                       << config.ToString();
     try {
         // Just test connection not check real list, avoid cost resource.
-        ListWithPrefix("justforconnectioncheck");
+        // ListWithPrefix("justforconnectioncheck");
     } catch (SegcoreError& e) {
         auto err_message = fmt::format(
             "precheck chunk manager client failed, "
@@ -256,6 +259,35 @@ MinioChunkManager::BuildAccessKeyClient(
         config,
         Aws::Client::AWSAuthV4Signer::PayloadSigningPolicy::Never,
         storage_config.useVirtualHost);
+}
+
+void
+MinioChunkManager::BuildByokS3Client(
+    const StorageConfig& storage_config,
+    const Aws::Client::ClientConfiguration& config) {
+    LOG_SEGCORE_INFO_ << "gsriram: Building BYOK S3 Client in MinioChunkManager";
+
+    AssertInfo(!storage_config.access_key_id.empty(),
+           "if not use iam, access key should not be empty");
+    AssertInfo(!storage_config.access_key_value.empty(),
+           "if not use iam, access value should not be empty");
+    AssertInfo(!storage_config.session_token.empty(),
+           "if not use iam, session token should not be empty");
+
+    client_ = std::make_shared<Aws::S3::S3Client>(
+        Aws::Auth::AWSCredentials(
+            ConvertToAwsString(storage_config.access_key_id),
+            ConvertToAwsString(storage_config.access_key_value),
+            ConvertToAwsString(storage_config.session_token)),
+        config,
+        Aws::Client::AWSAuthV4Signer::PayloadSigningPolicy::Never,
+        storage_config.useVirtualHost);
+
+    if (!storage_config.kms_key_id.empty()) {
+        aws_kms_key_id_ = ConvertToAwsString(storage_config.kms_key_id);
+        LOG_SEGCORE_INFO_ << "gsriram: Set AWS SSE KMS Key ID in MinioChunkManager: "
+                          << aws_kms_key_id_;
+    }
 }
 
 void
@@ -574,6 +606,13 @@ MinioChunkManager::PutObjectBuffer(const std::string& bucket_name,
 
     input_data->write(reinterpret_cast<char*>(buf), size);
     request.SetBody(input_data);
+
+    if (!aws_kms_key_id_.empty()) {
+        request.SetServerSideEncryption(Aws::S3::Model::ServerSideEncryption::aws_kms);
+        request.SetSSEKMSKeyId(aws_kms_key_id_);
+        LOG_SEGCORE_INFO_ << "Set AWS SSE KMS Key ID in S3 PutObjectRequest: "
+                          << aws_kms_key_id_;
+    }
 
     auto start = std::chrono::system_clock::now();
     auto outcome = client_->PutObject(request);

@@ -138,8 +138,8 @@ case "${unameOut}" in
         export CLANG_TOOLS_PATH="${llvm_prefix}/bin"
         export CC="${llvm_prefix}/bin/clang"
         export CXX="${llvm_prefix}/bin/clang++"
-        export LDFLAGS="-L${llvm_prefix}/lib -L/usr/local/opt/libomp/lib"
-        export CXXFLAGS="-I${llvm_prefix}/include -I/usr/local/include -I/usr/local/opt/libomp/include"
+        export LDFLAGS="-L${llvm_prefix}/lib -L/usr/local/opt/libomp/lib -L/opt/homebrew/lib -lgrpc++ -lgrpc -lgpr -lprotobuf -lpthread"
+        export CXXFLAGS="-I${llvm_prefix}/include -I/usr/local/include -I/usr/local/opt/libomp/include I/opt/homebrew/include"
         ;;
           *)   echo "==System:${unameOut}";
 esac

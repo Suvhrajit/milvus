@@ -18,6 +18,8 @@ package types
 
 import (
 	"context"
+	"github.com/milvus-io/milvus/internal/proto/dpccvspb"
+
 	"io"
 
 	"github.com/tikv/client-go/v2/txnkv"
@@ -97,6 +99,11 @@ type DataNodeComponent interface {
 	// Return nil in status:
 	//     The dataCoord is not nil.
 	SetDataCoordClient(dataCoord DataCoordClient) error
+}
+
+type DpcCvsAccessManagerClient interface {
+	io.Closer
+	dpccvspb.DpcCvsAccessManagerClient
 }
 
 // DataCoordClient is the client interface for datacoord server

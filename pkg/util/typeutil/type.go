@@ -46,6 +46,8 @@ const (
 	DataNodeRole = "datanode"
 	// IndexNodeRole is a constant represent IndexNode
 	IndexNodeRole = "indexnode"
+	// AccessManagerRole
+	AccessManagerRole = "accessmanager"
 )
 
 var (
@@ -58,6 +60,7 @@ var (
 		IndexNodeRole,
 		DataCoordRole,
 		DataNodeRole,
+		AccessManagerRole,
 	)
 	serverTypeList = serverTypeSet.Collect()
 )

@@ -2,6 +2,8 @@ module github.com/milvus-io/milvus
 
 go 1.18
 
+toolchain go1.22.4
+
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.7.0
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.3.0

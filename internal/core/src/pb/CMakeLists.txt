@@ -17,7 +17,9 @@ add_library(milvus_proto STATIC
     plan.pb.cc
     schema.pb.cc
     segcore.pb.cc
-    )
+    dpc_cvs_access_manager.pb.cc
+    dpc_cvs_access_manager.grpc.pb.cc
+)
 message(STATUS "milvus proto sources: " ${milvus_proto_srcs})
 
 target_link_libraries( milvus_proto PUBLIC ${CONAN_LIBS} )

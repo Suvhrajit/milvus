@@ -154,6 +154,9 @@ type Server struct {
 
 	// manage ways that data coord access other coord
 	broker Broker
+
+	// flag to toggle index file base path should containe collection id or not
+	useCollectionIdBasedIndexPath bool
 }
 
 // ServerHelper datacoord server injection helper
@@ -209,18 +212,19 @@ func WithSegmentManager(manager Manager) Option {
 func CreateServer(ctx context.Context, factory dependency.Factory, opts ...Option) *Server {
 	rand.Seed(time.Now().UnixNano())
 	s := &Server{
-		ctx:                    ctx,
-		quitCh:                 make(chan struct{}),
-		factory:                factory,
-		flushCh:                make(chan UniqueID, 1024),
-		buildIndexCh:           make(chan UniqueID, 1024),
-		notifyIndexChan:        make(chan UniqueID),
-		dataNodeCreator:        defaultDataNodeCreatorFunc,
-		indexNodeCreator:       defaultIndexNodeCreatorFunc,
-		rootCoordClientCreator: defaultRootCoordCreatorFunc,
-		helper:                 defaultServerHelper(),
-		metricsCacheManager:    metricsinfo.NewMetricsCacheManager(),
-		enableActiveStandBy:    Params.DataCoordCfg.EnableActiveStandby.GetAsBool(),
+		ctx:                           ctx,
+		quitCh:                        make(chan struct{}),
+		factory:                       factory,
+		flushCh:                       make(chan UniqueID, 1024),
+		buildIndexCh:                  make(chan UniqueID, 1024),
+		notifyIndexChan:               make(chan UniqueID),
+		dataNodeCreator:               defaultDataNodeCreatorFunc,
+		indexNodeCreator:              defaultIndexNodeCreatorFunc,
+		rootCoordClientCreator:        defaultRootCoordCreatorFunc,
+		helper:                        defaultServerHelper(),
+		metricsCacheManager:           metricsinfo.NewMetricsCacheManager(),
+		enableActiveStandBy:           Params.DataCoordCfg.EnableActiveStandby.GetAsBool(),
+		useCollectionIdBasedIndexPath: Params.CommonCfg.UseCollectionIdBasedIndexPath.GetAsBool(),
 	}
 
 	for _, opt := range opts {
@@ -473,8 +477,19 @@ func (s *Server) stopCompactionTrigger() {
 }
 
 func (s *Server) newChunkManagerFactory() (storage.ChunkManager, error) {
-	chunkManagerFactory := storage.NewChunkManagerFactoryWithParam(Params)
-	cli, err := chunkManagerFactory.NewPersistentStorageChunkManager(s.ctx)
+
+	var cli storage.ChunkManager
+	var err error
+
+	if Params.CommonCfg.ByokEnabled.GetAsBool() {
+		log.Info("BYOK is enabled initialising with fabric factory")
+		chunkManagerFactory := storage.NewFabricChunkManagerFactoryWithParam(Params)
+		cli, err = chunkManagerFactory.NewPersistentStorageChunkManager(s.ctx)
+	} else {
+		chunkManagerFactory := storage.NewChunkManagerFactoryWithParam(Params)
+		cli, err = chunkManagerFactory.NewPersistentStorageChunkManager(s.ctx)
+	}
+
 	if err != nil {
 		log.Error("chunk manager init failed", zap.Error(err))
 		return nil, err
@@ -484,12 +499,13 @@ func (s *Server) newChunkManagerFactory() (storage.ChunkManager, error) {
 
 func (s *Server) initGarbageCollection(cli storage.ChunkManager) {
 	s.garbageCollector = newGarbageCollector(s.meta, s.handler, GcOption{
-		cli:              cli,
-		enabled:          Params.DataCoordCfg.EnableGarbageCollection.GetAsBool(),
-		checkInterval:    Params.DataCoordCfg.GCInterval.GetAsDuration(time.Second),
-		scanInterval:     Params.DataCoordCfg.GCScanIntervalInHour.GetAsDuration(time.Hour),
-		missingTolerance: Params.DataCoordCfg.GCMissingTolerance.GetAsDuration(time.Second),
-		dropTolerance:    Params.DataCoordCfg.GCDropTolerance.GetAsDuration(time.Second),
+		cli:                           cli,
+		enabled:                       Params.DataCoordCfg.EnableGarbageCollection.GetAsBool(),
+		checkInterval:                 Params.DataCoordCfg.GCInterval.GetAsDuration(time.Second),
+		scanInterval:                  Params.DataCoordCfg.GCScanIntervalInHour.GetAsDuration(time.Hour),
+		missingTolerance:              Params.DataCoordCfg.GCMissingTolerance.GetAsDuration(time.Second),
+		dropTolerance:                 Params.DataCoordCfg.GCDropTolerance.GetAsDuration(time.Second),
+		useCollectionIdBasedIndexPath: Params.CommonCfg.UseCollectionIdBasedIndexPath.GetAsBool(),
 	})
 }
 

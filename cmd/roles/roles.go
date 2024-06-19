@@ -101,7 +101,16 @@ func runComponent[T component](ctx context.Context,
 
 	sign := make(chan struct{})
 	go func() {
-		factory := dependency.NewFactory(localMsg)
+		params := paramtable.Get()
+
+		var factory dependency.Factory
+		if params.CommonCfg.ByokEnabled.GetAsBool() {
+			log.Info("BYOK is enabled initialising with fabric factory")
+			factory = &dependency.FabricFactory{}
+		} else {
+			factory = dependency.NewFactory(localMsg)
+		}
+
 		var err error
 		role, err = creator(ctx, factory)
 		if localMsg {

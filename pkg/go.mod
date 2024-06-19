@@ -2,6 +2,8 @@ module github.com/milvus-io/milvus/pkg
 
 go 1.18
 
+toolchain go1.22.4
+
 require (
 	github.com/apache/pulsar-client-go v0.6.1-0.20210728062540-29414db801a7
 	github.com/benesch/cgosymbolizer v0.0.0-20190515212042-bec6fe6e597b

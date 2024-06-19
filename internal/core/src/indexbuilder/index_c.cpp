@@ -26,7 +26,9 @@
 #include "pb/index_cgo_msg.pb.h"
 #include "storage/Util.h"
 #include "index/Meta.h"
-
+#include "dpccvsaccessmanager/DpcCvsAccessManagerClient.h"
+#include "storage/CollectionChunkManager.h"
+#include "log/Log.h"
 using namespace milvus;
 CStatus
 CreateIndex(enum CDataType dtype,
@@ -75,6 +77,7 @@ CreateIndex(enum CDataType dtype,
 CStatus
 CreateIndexV2(CIndex* res_index, CBuildIndexInfo c_build_index_info) {
     try {
+
         auto build_index_info = (BuildIndexInfo*)c_build_index_info;
         auto field_type = build_index_info->field_type;
 
@@ -114,8 +117,31 @@ CreateIndexV2(CIndex* res_index, CBuildIndexInfo c_build_index_info) {
                                               build_index_info->field_id,
                                               build_index_info->index_build_id,
                                               build_index_info->index_version};
-        auto chunk_manager = milvus::storage::CreateChunkManager(
+
+        milvus::storage::ChunkManagerPtr chunk_manager;
+	if (build_index_info->storage_config.byok_enabled) {
+	    LOG_SEGCORE_INFO_ << "gsriram: BYOK flag enabled";
+	    grpc_init();
+	    milvus::storage::CollectionChunkManager::Init(build_index_info->storage_config);
+            chunk_manager = milvus::storage::CollectionChunkManager::GetChunkManager(
+                build_index_info->collection_id,
+                std::getenv("MILVUS_INSTANCE_NAME"),
+                true);
+	} else {
+	    LOG_SEGCORE_INFO_ << "gsriram: BYOK flag is disabled";
+	    chunk_manager = milvus::storage::CreateChunkManager(
             build_index_info->storage_config);
+	}
+
+        if (chunk_manager == nullptr) {
+            LOG_SEGCORE_ERROR_ << "gsriram: Failed to get the chunk manager for collection ID: " << build_index_info->collection_id;
+            auto status = CStatus();
+            status.error_code = milvus::UnexpectedError;
+            status.error_msg = "Failed to get the remote chunk manager.";
+            return status;
+        }
+
+        // TODO: build_index_info->storage_config would not have the latest creds as GetChunkManager updates the storage_config locally. Need to check if this will have implications.
 
         milvus::storage::FileManagerContext fileManagerContext(
             field_meta, index_meta, chunk_manager);
@@ -316,6 +342,8 @@ NewBuildIndexInfo(CBuildIndexInfo* c_build_index_info,
         storage_config.region = c_storage_config.region;
         storage_config.useVirtualHost = c_storage_config.useVirtualHost;
         storage_config.requestTimeoutMs = c_storage_config.requestTimeoutMs;
+        storage_config.byok_enabled = c_storage_config.byok_enabled;
+        storage_config.useCollectionIdIndexPath = c_storage_config.useCollectionIdIndexPath;
 
         *c_build_index_info = build_index_info.release();
         auto status = CStatus();

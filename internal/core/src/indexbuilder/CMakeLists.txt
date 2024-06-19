@@ -29,6 +29,8 @@ endif ()
 # link order matters
 target_link_libraries(milvus_indexbuilder
         milvus_index
+        milvus_storage
+        dpccvsaccessmanager
         ${TBB}
         ${PLATFORM_LIBS}
         )

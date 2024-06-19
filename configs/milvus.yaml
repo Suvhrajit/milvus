@@ -64,14 +64,14 @@ localStorage:
 # Related configuration of MinIO/S3/GCS or any other service supports S3 API, which is responsible for data persistence for Milvus.
 # We refer to the storage service as MinIO/S3 in the following description for simplicity.
 minio:
-  address: localhost # Address of MinIO/S3
-  port: 9000 # Port of MinIO/S3
-  accessKeyID: minioadmin # accessKeyID of MinIO/S3
-  secretAccessKey: minioadmin # MinIO/S3 encryption string
-  useSSL: false # Access to MinIO/S3 with SSL
+  address: s3.us-west-2.amazonaws.com # Address of MinIO/S3
+  port: 443 # Port of MinIO/S3
+  accessKeyID: abcd1 # accessKeyID of MinIO/S3
+  secretAccessKey: abcd2 # MinIO/S3 encryption string
+  useSSL: true # Access to MinIO/S3 with SSL
   ssl:
     tlsCACert: /path/to/public.crt # path to your CACert file, ignore when it is empty
-  bucketName: a-bucket # Bucket name in MinIO/S3
+  bucketName: aka123-test-bucket  # Bucket name in MinIO/S3
   rootPath: files # The root path where the message is stored in MinIO/S3
   # Whether to useIAM role to access S3/GCS instead of access/secret keys
   # For more information, refer to
@@ -255,6 +255,17 @@ proxy:
   # query whose executed time exceeds the `slowQuerySpanInSeconds` can be considered slow, in seconds.
   slowQuerySpanInSeconds: 5
 
+accessManager:
+  ip: 127.0.0.1
+  port: 7049
+  grpc:
+    serverMaxSendSize: 536870912
+    serverMaxRecvSize: 268435456
+    clientMaxSendSize: 268435456
+    clientMaxRecvSize: 536870912
+    client:
+      dialTimeout: 90000
+
 # Related configuration of queryCoord, used to manage topology and load balancing for the query nodes, and handoff from growing segments to sealed segments.
 queryCoord:
   autoHandoff: true # Enable auto handoff
@@ -435,10 +446,10 @@ dataCoord:
 
   enableGarbageCollection: true
   gc:
-    interval: 3600 # gc interval in seconds
-    scanInterval: 168 #gc residual file scan interval in hours
-    missingTolerance: 3600 # file meta missing tolerance duration in seconds, 3600
-    dropTolerance: 10800 # file belongs to dropped entity tolerance duration in seconds. 10800
+    interval: 120 # gc interval in seconds
+    scanInterval: 1 #gc residual file scan interval in hours
+    missingTolerance: 120 # file meta missing tolerance duration in seconds, 3600
+    dropTolerance: 120 # file belongs to dropped entity tolerance duration in seconds. 10800
   enableActiveStandby: false
   # can specify ip for example
   # ip: 127.0.0.1
@@ -493,7 +504,7 @@ dataNode:
 
 # Configures the system log output.
 log:
-  level: info # Only supports debug, info, warn, error, panic, or fatal. Default 'info'.
+  level: debug # Only supports debug, info, warn, error, panic, or fatal. Default 'info'.
   file:
     rootPath: # root dir path to put logs, default "" means no log file will print. please adjust in embedded Milvus: /tmp/milvus/logs
     maxSize: 300 # MB
@@ -597,10 +608,15 @@ common:
     threshold:
       info: 500 # minimum milliseconds for printing durations in info level
       warn: 1000 # minimum milliseconds for printing durations in warn level
+  storage:
+    useCollectionIdBasedIndexPath: true
   ttMsgEnabled: true # Whether the instance disable sending ts messages
   bloomFilterSize: 100000
   maxBloomFalsePositive: 0.05
   traceLogMode: 0 # trace request info, 0: none, 1: simple request info, like collection/partition/database name, 2: request detail
+  byok:
+    enabled: true
+  credentialsRefreshThresholdMinutes: 10
 
 # QuotaConfig, configurations of Milvus quota and limits.
 # By default, we enable:

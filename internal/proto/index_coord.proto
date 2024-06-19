@@ -213,6 +213,10 @@ message StorageConfig {
   string cloud_provider = 12;
   int64 request_timeout_ms = 13;
   string sslCACert = 14;
+  string session_token = 15;
+  string kms_key_id = 16;
+  bool byok_enabled = 17;
+  bool useCollectionIdIndexPath = 18;
 }
 
 message CreateJobRequest {

@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+option java_outer_classname = "DpcCvsAccessManagerProto";
+option java_package = "com.salesforce.cdp.dpccvsaccessmanager.grpc.v1";
+
+package salesforce.cdp.dpccvsaccessmanager.v1;
+
+service DpcCvsAccessManager {
+
+  rpc GetCredentials (GetCredentialsRequest) returns (GetCredentialsResponse) {
+  }
+
+}
+
+enum ApplicationType {
+  APP_TYPE_UNSPECIFIED = 0;
+  MILVUS = 1;
+}
+
+message GetCredentialsRequest {
+  ApplicationType application_type = 1;
+  string collection_id = 2;
+  string instance_name = 3;
+  string bucket_name = 4;
+  bool write_access = 5;
+}
+
+message GetCredentialsResponse {
+  string access_key_id = 1;
+  string secret_access_key = 2;
+  string session_token = 3;
+  string expiration_timestamp = 4;
+
+  //Optional tenant key id if present
+  string tenant_key_id = 5;
+}
