@@ -196,6 +196,10 @@ set(Python3_FIND_REGISTRY "LAST")
 set(Python3_FIND_FRAMEWORK "LAST")
 find_package(Python3)
 set(PYTHON_EXECUTABLE ${Python3_EXECUTABLE})
+# Find Protobuf and gRPC
+find_package( Protobuf REQUIRED )
+find_package( gRPC REQUIRED )
+find_package( absl REQUIRED )
 
 message( STATUS "Found Python at ${PYTHON_EXECUTABLE}")
 

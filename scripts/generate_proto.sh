@@ -28,7 +28,7 @@ PROTO_DIR=$ROOT_DIR/internal/proto/
 API_PROTO_DIR=$ROOT_DIR/cmake_build/thirdparty/milvus-proto/proto
 CPP_SRC_DIR=$ROOT_DIR/internal/core
 PROTOC_BIN=$ROOT_DIR/cmake_build/bin/protoc
-
+PROTOC_GRPC_PLUGIN=$ROOT_DIR/cmake_build/bin/grpc_cpp_plugin
 PROGRAM=$(basename "$0")
 GOPATH=$(go env GOPATH)
 
@@ -79,6 +79,8 @@ ${protoc_opt} --cpp_out=$CPP_SRC_DIR/src/pb common.proto|| { echo 'generate comm
 ${protoc_opt} --cpp_out=$CPP_SRC_DIR/src/pb segcore.proto|| { echo 'generate segcore.proto failed'; exit 1; }
 ${protoc_opt} --cpp_out=$CPP_SRC_DIR/src/pb index_cgo_msg.proto|| { echo 'generate index_cgo_msg.proto failed'; exit 1; }
 ${protoc_opt} --cpp_out=$CPP_SRC_DIR/src/pb plan.proto|| { echo 'generate plan.proto failed'; exit 1; }
+${protoc_opt} --cpp_out=$CPP_SRC_DIR/src/pb dpc_cvs_access_manager.proto  || { echo 'generate dpc_cvs_access_manager.proto failed'; exit 1; }
+${protoc_opt} --grpc_out=$CPP_SRC_DIR/src/pb dpc_cvs_access_manager.proto --plugin=protoc-gen-grpc=$PROTOC_GRPC_PLUGIN|| { echo 'generate gRPC dpc_cvs_access_manager.proto failed'; exit 1; }
 
 popd
 
