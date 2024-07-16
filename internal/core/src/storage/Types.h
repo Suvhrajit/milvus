@@ -97,6 +97,8 @@ struct StorageConfig {
     bool useIAM = false;
     bool useVirtualHost = false;
     int64_t requestTimeoutMs = 3000;
+    std::string session_token = "";
+    std::string kms_key = "";
 
     std::string
     ToString() const {
