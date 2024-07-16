@@ -1,6 +1,6 @@
-#include "access_manager_client.h"
+#include "DpcCvsAccessManagerClient.h"
 
-namespace milvus::accessmanager {
+namespace milvus::dpccvsaccessmanager {
 DpcCvsAccessManagerClient::DpcCvsAccessManagerClient(std::shared_ptr<grpc::Channel> channel)
     : stub_(salesforce::cdp::dpccvsaccessmanager::v1::DpcCvsAccessManager::NewStub(channel)) {}
 

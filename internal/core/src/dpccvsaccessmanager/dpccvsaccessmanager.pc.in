@@ -1,9 +1,9 @@
 libdir=@CMAKE_INSTALL_FULL_LIBDIR@
 includedir=@CMAKE_INSTALL_FULL_INCLUDEDIR@
 
-Name: Milvus AccessManager
+Name: Dpc Cvs AccessManager
 Description: AccessManager modules for Milvus
 Version: @MILVUS_VERSION@
 
-Libs: -L${libdir} -lmilvus_accessmanager
+Libs: -L${libdir} -ldpccvsaccessmanager
 Cflags: -I${includedir}

@@ -9,7 +9,7 @@
 #include "pb/dpc_cvs_access_manager.pb.h"
 #include "pb/dpc_cvs_access_manager.grpc.pb.h"
 
-namespace milvus::accessmanager {
+namespace milvus::dpccvsaccessmanager {
 
 class DpcCvsAccessManagerClient {
 public:
