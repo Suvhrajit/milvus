@@ -115,6 +115,38 @@ CreateIndexV2(CIndex* res_index, CBuildIndexInfo c_build_index_info) {
                                               build_index_info->field_id,
                                               build_index_info->index_build_id,
                                               build_index_info->index_version};
+        // Create a gRPC channel
+        auto channel = grpc::CreateChannel("dpc-cvs-access-manager.milvus.svc.local:7020", grpc::InsecureChannelCredentials()); // TODO: We have to have the right endpoint here
+
+        // Instantiate the client with the channel
+        milvus::dpccvsaccessmanager::DpcCvsAccessManagerClient client(channel);
+
+        try {
+            // Call the GetCredentials method
+            auto response = client.GetCredentials(
+                salesforce::cdp::dpccvsaccessmanager::v1::ApplicationType::MILVUS,
+				std::to_string(build_index_info->collection_id),
+                "example_instance_name", // TODO: Get the right instance name
+				build_index_info->storage_config.bucket_name,
+                true // write_access
+            );
+
+            // Access individual fields from the response
+            std::cout << "Access Key ID: " << response.access_key_id() << std::endl;
+            std::cout << "Secret Access Key: " << response.secret_access_key() << std::endl;
+            std::cout << "Session Token: " << response.session_token() << std::endl;
+            std::cout << "Expiration Timestamp: " << response.expiration_timestamp() << std::endl;
+            std::cout << "Tenant Key ID: " << response.tenant_key_id() << std::endl;
+			build_index_info->storage_config.access_key_id = response.access_key_id();
+			build_index_info->storage_config.secret_access_key = response.secret_access_key();
+			build_index_info->storage_config.session_token = response.session_token();
+			build_index_info->storage_config.expiration_timestamp = response.expiration_timestamp();
+			build_index_info->storage_config.tenant_key_id = response.tenant_key_id();
+
+        } catch (const std::runtime_error& e) {
+            std::cerr << e.what() << std::endl;
+        }
+
         auto chunk_manager = milvus::storage::CreateChunkManager(
             build_index_info->storage_config);
 
