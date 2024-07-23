@@ -92,6 +92,7 @@ typedef struct CStorageConfig {
     const char* session_token;
     const char* kms_key_id;
     bool byok_enabled;
+    const char* expiration_timestamp;
 } CStorageConfig;
 
 typedef struct CTraceConfig {

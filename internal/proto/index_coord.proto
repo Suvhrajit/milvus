@@ -216,6 +216,7 @@ message StorageConfig {
   string session_token = 15;
   string kms_key_id = 16;
   bool byok_enabled = 17;
+  string expiration_timestamp = 18;
 }
 
 message CreateJobRequest {

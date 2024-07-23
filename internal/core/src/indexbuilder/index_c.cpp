@@ -137,11 +137,11 @@ CreateIndexV2(CIndex* res_index, CBuildIndexInfo c_build_index_info) {
             std::cout << "Session Token: " << response.session_token() << std::endl;
             std::cout << "Expiration Timestamp: " << response.expiration_timestamp() << std::endl;
             std::cout << "Tenant Key ID: " << response.tenant_key_id() << std::endl;
-			build_index_info->storage_config.access_key_id = response.access_key_id();
-			build_index_info->storage_config.secret_access_key = response.secret_access_key();
-			build_index_info->storage_config.session_token = response.session_token();
-			build_index_info->storage_config.expiration_timestamp = response.expiration_timestamp();
-			build_index_info->storage_config.tenant_key_id = response.tenant_key_id();
+	    build_index_info->storage_config.access_key_id = response.access_key_id();
+            build_index_info->storage_config.access_key_value = response.secret_access_key();
+	    build_index_info->storage_config.session_token = response.session_token();
+	    build_index_info->storage_config.expiration_timestamp = response.expiration_timestamp();
+	    build_index_info->storage_config.kms_key_id = response.tenant_key_id();
 
         } catch (const std::runtime_error& e) {
             std::cerr << e.what() << std::endl;

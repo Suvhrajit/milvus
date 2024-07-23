@@ -54,6 +54,7 @@ func NewBuildIndexInfo(config *indexpb.StorageConfig) (*BuildIndexInfo, error) {
 	cSslCACert := C.CString(config.SslCACert)
 	cSessionToken := C.CString(config.SessionToken)
 	cKmsKeyId := C.CString(config.KmsKeyId)
+	cExpirationTimestamp := C.CString(config.ExpirationTimestamp)
 	defer C.free(unsafe.Pointer(cAddress))
 	defer C.free(unsafe.Pointer(cBucketName))
 	defer C.free(unsafe.Pointer(cAccessKey))
@@ -66,6 +67,7 @@ func NewBuildIndexInfo(config *indexpb.StorageConfig) (*BuildIndexInfo, error) {
 	defer C.free(unsafe.Pointer(cSslCACert))
 	defer C.free(unsafe.Pointer(cSessionToken))
 	defer C.free(unsafe.Pointer(cKmsKeyId))
+	defer C.free(unsafe.Pointer(cExpirationTimestamp))
 	storageConfig := C.CStorageConfig{
 		address:          cAddress,
 		bucket_name:      cBucketName,
@@ -84,6 +86,7 @@ func NewBuildIndexInfo(config *indexpb.StorageConfig) (*BuildIndexInfo, error) {
 		session_token:    cSessionToken,
 		kms_key_id:       cKmsKeyId,
 		byok_enabled:     C.bool(config.ByokEnabled),
+		expiration_timestamp: cExpirationTimestamp,
 	}
 
 	status := C.NewBuildIndexInfo(&cBuildIndexInfo, storageConfig)
