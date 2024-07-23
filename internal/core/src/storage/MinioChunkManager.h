@@ -226,6 +226,10 @@ class MinioChunkManager : public ChunkManager {
     BuildAccessKeyClient(const StorageConfig& storage_config,
                          const Aws::Client::ClientConfiguration& config);
 
+    void
+    BuildAccessKeyAndSessionTokenClient(const StorageConfig& storage_config,
+                                        const Aws::Client::ClientConfiguration& config);
+
     Aws::SDKOptions sdk_options_;
     static std::atomic<size_t> init_count_;
     static std::mutex client_mutex_;

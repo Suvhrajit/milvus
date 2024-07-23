@@ -90,7 +90,8 @@ typedef struct CStorageConfig {
     bool useVirtualHost;
     int64_t requestTimeoutMs;
     const char* session_token;
-    const char* kms_key;
+    const char* kms_key_id;
+    bool byok_enabled;
 } CStorageConfig;
 
 typedef struct CTraceConfig {

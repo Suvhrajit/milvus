@@ -198,7 +198,9 @@ void
 MinioChunkManager::BuildS3Client(
     const StorageConfig& storage_config,
     const Aws::Client::ClientConfiguration& config) {
-    if (storage_config.useIAM) {
+    if (storage_config.byok_enabled) {
+        BuildAccessKeyAndSessionTokenClient(storage_config, config);
+    } else if (storage_config.useIAM) {
         auto provider =
             std::make_shared<Aws::Auth::DefaultAWSCredentialsProviderChain>();
         auto aws_credentials = provider->GetAWSCredentials();
@@ -253,6 +255,27 @@ MinioChunkManager::BuildAccessKeyClient(
         Aws::Auth::AWSCredentials(
             ConvertToAwsString(storage_config.access_key_id),
             ConvertToAwsString(storage_config.access_key_value)),
+        config,
+        Aws::Client::AWSAuthV4Signer::PayloadSigningPolicy::Never,
+        storage_config.useVirtualHost);
+}
+
+void
+MinioChunkManager::BuildAccessKeyAndSessionTokenClient(
+    const StorageConfig& storage_config,
+    const Aws::Client::ClientConfiguration& config) {
+    AssertInfo(!storage_config.access_key_id.empty(),
+           "if not use iam, access key should not be empty");
+    AssertInfo(!storage_config.access_key_value.empty(),
+           "if not use iam, access value should not be empty");
+    AssertInfo(!storage_config.session_token.empty(),
+           "if not use iam, session token should not be empty");
+
+    client_ = std::make_shared<Aws::S3::S3Client>(
+        Aws::Auth::AWSCredentials(
+            ConvertToAwsString(storage_config.access_key_id),
+            ConvertToAwsString(storage_config.access_key_value),
+            ConvertToAwsString(storage_config.session_token)),
         config,
         Aws::Client::AWSAuthV4Signer::PayloadSigningPolicy::Never,
         storage_config.useVirtualHost);
