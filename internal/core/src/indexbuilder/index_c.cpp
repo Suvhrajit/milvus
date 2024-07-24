@@ -131,6 +131,8 @@ CreateIndexV2(CIndex* res_index, CBuildIndexInfo c_build_index_info) {
             return status;
         }
 
+        // TODO: build_index_info->storage_config would not have the latest creds as GetCollectionIdChunkManager updates the storage_config locally. Need to check if this will have implications.
+
         milvus::storage::FileManagerContext fileManagerContext(
             field_meta, index_meta, chunk_manager);
 
