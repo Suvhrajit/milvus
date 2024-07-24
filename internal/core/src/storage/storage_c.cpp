@@ -17,7 +17,7 @@
 #include "storage/storage_c.h"
 #include "storage/prometheus_client.h"
 #include "storage/RemoteChunkManagerSingleton.h"
-#include "storage/CollectionIdChunkManagerCache.h"
+#include "storage/CollectionChunkManager.h"
 #include "storage/LocalChunkManagerSingleton.h"
 #include "storage/ChunkCacheSingleton.h"
 
@@ -80,7 +80,7 @@ InitRemoteChunkManagerSingleton(CStorageConfig c_storage_config) {
 
 		// need to make sure that the flag is available
         if (storage_config.byok_enabled) {
-		    milvus::storage::CollectionIdChunkManagerCache::Init(storageConfig);
+		    milvus::storage::CollectionChunkManager::Init(storageConfig);
         }
 
         return milvus::SuccessCStatus();

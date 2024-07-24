@@ -26,6 +26,7 @@
 #include "storage/Util.h"
 #include "storage/RemoteChunkManagerSingleton.h"
 #include "storage/LocalChunkManagerSingleton.h"
+#include "storage/CollectionChunkManager.h"
 
 bool
 IsLoadWithDisk(const char* index_type, int index_engine_version) {
@@ -258,7 +259,7 @@ AppendIndexV2(CTraceContext c_trace, CLoadIndexInfo c_load_index_info) {
 
         // need to make sure that the flag is available
         if (storage_config.byok_enabled) {
-            remote_chunk_manager = milvus::storage::CollectionIdChunkManagerCache::GetClient(
+            remote_chunk_manager = milvus::storage::CollectionChunkManager::GetClient(
                 salesforce::cdp::dpccvsaccessmanager::v1::ApplicationType::MILVUS,
                 std::to_string(load_index_info->collection_id),
                 "example_instance_name", // TODO: Get the right instance name

@@ -1,4 +1,4 @@
-#include "CollectionIdChunkManagerCache.h"
+#include "CollectionChunkManager.h"
 #include <sstream>
 #include <iomanip>
 #include <ctime>
@@ -6,23 +6,23 @@
 namespace milvus::storage {
 
 // static storage config template to be used to create new collection Id chunk managers
-StorageConfig CollectionIdChunkManagerCache::storageConfigTemplate;
+StorageConfig CollectionChunkManager::storageConfigTemplate;
 
 // in-memory cache to store collection Id chunk managers with their expiration time
-std::unordered_map<std::string, std::tuple<std::shared_ptr<ChunkManager>, std::chrono::system_clock::time_point>> CollectionIdChunkManagerCache::chunkManagerMemoryCache;
+std::unordered_map<std::string, std::tuple<std::shared_ptr<ChunkManager>, std::chrono::system_clock::time_point>> CollectionChunkManager::chunkManagerMemoryCache;
 
 // Needs to be called in order for new chunk managers to be created. Called in storage_c.cpp.
-void CollectionIdChunkManagerCache::Init(const StorageConfig& config) {
+void CollectionChunkManager::Init(const StorageConfig& config) {
     storageConfigTemplate = config;
 }
 
 // helper method to help determine is a chunk manager is still valid based on expiration date
-bool CollectionIdChunkManagerCache::IsExpired(const std::chrono::system_clock::time_point& expiration) {
+bool CollectionChunkManager::IsExpired(const std::chrono::system_clock::time_point& expiration) {
     return std::chrono::system_clock::now() > expiration;
 }
 
 // helper method to manage the communication with access manager
-std::shared_ptr<milvus::dpccvsaccessmanager::GetCredentialsResponse> CollectionIdChunkManagerCache::GetNewCredentials(
+std::shared_ptr<milvus::dpccvsaccessmanager::GetCredentialsResponse> CollectionChunkManager::GetNewCredentials(
     salesforce::cdp::dpccvsaccessmanager::v1::ApplicationType application_type,
     const std::string& collection_id,
     const std::string& instance_name,
@@ -43,21 +43,21 @@ std::shared_ptr<milvus::dpccvsaccessmanager::GetCredentialsResponse> CollectionI
 }
 
 // helper method to create a new storage config based on static template and the response from access manager
-StorageConfig CollectionIdChunkManagerCache::GetUpdatedStorageConfig(const milvus::dpccvsaccessmanager::GetCredentialsResponse& response) {
+StorageConfig CollectionChunkManager::GetUpdatedStorageConfig(const milvus::dpccvsaccessmanager::GetCredentialsResponse& response) {
     StorageConfig updated_config = storageConfigTemplate;
 
     updated_config.access_key_id = response.access_key_id();
-    updated_config.secret_access_key = response.secret_access_key();
+    updated_config.access_key_value = response.secret_access_key();
     updated_config.session_token = response.session_token();
     updated_config.expiration_timestamp = response.expiration_timestamp();
-    updated_config.tenant_key_id = response.tenant_key_id();
+    updated_config.kms_key_id = response.tenant_key_id();
 
     return updated_config;
 }
 
 // the main method that is used to get or create the collection Id chunk manager
 // called in the load_index_c.cpp
-std::shared_ptr<ChunkManager> CollectionIdChunkManagerCache::GetCollectionIdChunkManager(
+std::shared_ptr<ChunkManager> CollectionChunkManager::GetCollectionIdChunkManager(
     salesforce::cdp::dpccvsaccessmanager::v1::ApplicationType application_type,
     const std::string& collection_id,
     const std::string& instance_name,

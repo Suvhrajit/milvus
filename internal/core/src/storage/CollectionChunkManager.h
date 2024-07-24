@@ -13,7 +13,7 @@
 
 namespace milvus::storage {
 
-class CollectionIdChunkManagerCache {
+class CollectionChunkManager {
 public:
     static void Init(const StorageConfig& config);
     static std::shared_ptr<ChunkManager> GetCollectionIdChunkManager(
