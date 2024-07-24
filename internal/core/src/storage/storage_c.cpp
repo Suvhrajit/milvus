@@ -75,12 +75,14 @@ InitRemoteChunkManagerSingleton(CStorageConfig c_storage_config) {
         storage_config.useVirtualHost = c_storage_config.useVirtualHost;
         storage_config.region = c_storage_config.region;
         storage_config.requestTimeoutMs = c_storage_config.requestTimeoutMs;
-        milvus::storage::RemoteChunkManagerSingleton::GetInstance().Init(
-            storage_config);
+        storage_config.byok_enabled = c_storage_config.byok_enabled;
 
 		// need to make sure that the flag is available
         if (storage_config.byok_enabled) {
-		    milvus::storage::CollectionChunkManager::Init(storageConfig);
+		    milvus::storage::CollectionChunkManager::Init(storage_config);
+        } else {
+            milvus::storage::RemoteChunkManagerSingleton::GetInstance().Init(
+                storage_config);
         }
 
         return milvus::SuccessCStatus();

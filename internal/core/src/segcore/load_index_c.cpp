@@ -257,14 +257,14 @@ AppendIndexV2(CTraceContext c_trace, CLoadIndexInfo c_load_index_info) {
             milvus::storage::RemoteChunkManagerSingleton::GetInstance()
                 .GetRemoteChunkManager();
 
-        // need to make sure that the flag is available
-        if (storage_config.byok_enabled) {
-            remote_chunk_manager = milvus::storage::CollectionChunkManager::GetClient(
+        // todo: need to make sure that the flag is available
+        // if (storage_config.byok_enabled) {
+            remote_chunk_manager = milvus::storage::CollectionChunkManager::GetCollectionIdChunkManager(
                 salesforce::cdp::dpccvsaccessmanager::v1::ApplicationType::MILVUS,
                 std::to_string(load_index_info->collection_id),
                 "example_instance_name", // TODO: Get the right instance name
                 true);
-        }
+        // }
 
         auto config = milvus::index::ParseConfigFromIndexParams(
             load_index_info->index_params);

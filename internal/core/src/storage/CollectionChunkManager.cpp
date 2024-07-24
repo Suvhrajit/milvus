@@ -1,4 +1,5 @@
 #include "CollectionChunkManager.h"
+#include "storage/Util.h"
 #include <sstream>
 #include <iomanip>
 #include <ctime>
@@ -22,7 +23,7 @@ bool CollectionChunkManager::IsExpired(const std::chrono::system_clock::time_poi
 }
 
 // helper method to manage the communication with access manager
-std::shared_ptr<milvus::dpccvsaccessmanager::GetCredentialsResponse> CollectionChunkManager::GetNewCredentials(
+std::shared_ptr<salesforce::cdp::dpccvsaccessmanager::v1::GetCredentialsResponse> CollectionChunkManager::GetNewCredentials(
     salesforce::cdp::dpccvsaccessmanager::v1::ApplicationType application_type,
     const std::string& collection_id,
     const std::string& instance_name,
@@ -43,7 +44,7 @@ std::shared_ptr<milvus::dpccvsaccessmanager::GetCredentialsResponse> CollectionC
 }
 
 // helper method to create a new storage config based on static template and the response from access manager
-StorageConfig CollectionChunkManager::GetUpdatedStorageConfig(const milvus::dpccvsaccessmanager::GetCredentialsResponse& response) {
+StorageConfig CollectionChunkManager::GetUpdatedStorageConfig(const salesforce::cdp::dpccvsaccessmanager::v1::GetCredentialsResponse& response) {
     StorageConfig updated_config = storageConfigTemplate;
 
     updated_config.access_key_id = response.access_key_id();
@@ -56,7 +57,7 @@ StorageConfig CollectionChunkManager::GetUpdatedStorageConfig(const milvus::dpcc
 }
 
 // Helper method to convert expiration string to std::chrono::system_clock::time_point
-std::chrono::system_clock::time_point CollectionChunkManager::ConvertToChronoTime(const std::string& time_str) const {
+std::chrono::system_clock::time_point CollectionChunkManager::ConvertToChronoTime(const std::string& time_str) {
     std::tm tm = {};
     std::istringstream ss(time_str);
     ss >> std::get_time(&tm, "%Y-%m-%dT%H:%M:%SZ");
