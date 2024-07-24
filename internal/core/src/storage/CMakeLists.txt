@@ -57,6 +57,7 @@ set(STORAGE_FILES
     DiskFileManagerImpl.cpp
     ThreadPools.cpp
     ChunkCache.cpp
+    CollectionChunkManager.cpp
     TencentCloudCredentialsProvider.cpp
     TencentCloudSTSClient.cpp)
 
