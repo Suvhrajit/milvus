@@ -15,8 +15,8 @@ namespace milvus::storage {
 
 class CollectionChunkManager {
 public:
-    static void Init(const StorageConfig& config);
-    static std::shared_ptr<ChunkManager> GetCollectionIdChunkManager(
+    void Init(const StorageConfig& config);
+    std::shared_ptr<ChunkManager> GetCollectionIdChunkManager(
         salesforce::cdp::dpccvsaccessmanager::v1::ApplicationType application_type,
         const std::string& collection_id,
         const std::string& instance_name,
@@ -26,14 +26,16 @@ private:
     static StorageConfig storageConfigTemplate;
     static std::unordered_map<std::string, std::tuple<std::shared_ptr<ChunkManager>, std::chrono::system_clock::time_point>> chunkManagerMemoryCache;
 
-    static bool IsExpired(const std::chrono::system_clock::time_point& expiration);
-    static StorageConfig GetUpdatedStorageConfig(const milvus::dpccvsaccessmanager::GetCredentialsResponse& response);
-    static std::shared_ptr<milvus::dpccvsaccessmanager::GetCredentialsResponse> GetNewCredentials(
+    bool IsExpired(const std::chrono::system_clock::time_point& expiration);
+    StorageConfig GetUpdatedStorageConfig(const milvus::dpccvsaccessmanager::GetCredentialsResponse& response);
+    std::shared_ptr<milvus::dpccvsaccessmanager::GetCredentialsResponse> GetNewCredentials(
         salesforce::cdp::dpccvsaccessmanager::v1::ApplicationType application_type,
         const std::string& collection_id,
         const std::string& instance_name,
         const std::string& bucket_name,
         bool write_access);
+
+    std::chrono::system_clock::time_point ConvertToChronoTime(const std::string& time_str) const;
 };
 
 } // namespace milvus::storage

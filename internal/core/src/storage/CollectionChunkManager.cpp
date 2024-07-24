@@ -55,6 +55,14 @@ StorageConfig CollectionChunkManager::GetUpdatedStorageConfig(const milvus::dpcc
     return updated_config;
 }
 
+// Helper method to convert expiration string to std::chrono::system_clock::time_point
+std::chrono::system_clock::time_point CollectionChunkManager::ConvertToChronoTime(const std::string& time_str) const {
+    std::tm tm = {};
+    std::istringstream ss(time_str);
+    ss >> std::get_time(&tm, "%Y-%m-%dT%H:%M:%SZ");
+    return std::chrono::system_clock::from_time_t(std::mktime(&tm));
+}
+
 // the main method that is used to get or create the collection Id chunk manager
 // called in the load_index_c.cpp
 std::shared_ptr<ChunkManager> CollectionChunkManager::GetCollectionIdChunkManager(
@@ -78,11 +86,7 @@ std::shared_ptr<ChunkManager> CollectionChunkManager::GetCollectionIdChunkManage
 
     auto chunk_manager = milvus::storage::CreateChunkManager(updated_config);
 
-    // Convert expiration string to std::chrono::system_clock::time_point
-    std::tm tm = {};
-    std::istringstream ss(updated_config.expiration_timestamp);
-    ss >> std::get_time(&tm, "%Y-%m-%dT%H:%M:%SZ");
-    std::chrono::system_clock::time_point expiration = std::chrono::system_clock::from_time_t(std::mktime(&tm));
+    std::chrono::system_clock::time_point expiration = ConvertToChronoTime(updated_config.expiration_timestamp);
 
     chunkManagerMemoryCache[collection_id] = std::make_tuple(chunk_manager, expiration);
 
