@@ -37,10 +37,14 @@ std::shared_ptr<salesforce::cdp::dpccvsaccessmanager::v1::GetCredentialsResponse
     milvus::dpccvsaccessmanager::DpcCvsAccessManagerClient client(channel);
 
     // Request new credentials
-    auto response = std::make_shared<salesforce::cdp::dpccvsaccessmanager::v1::GetCredentialsResponse>();
-    *response = client.GetCredentials(application_type, collection_id, instance_name, bucket_name, write_access);
-
-    return response;
+    try {
+        auto response = std::make_shared<salesforce::cdp::dpccvsaccessmanager::v1::GetCredentialsResponse>();
+        *response = client.GetCredentials(application_type, collection_id, instance_name, bucket_name, write_access);
+        return response;
+    } catch (const std::runtime_error& e) {
+        std::cerr << "Error getting new credentials: " << e.what() << std::endl;
+    }
+    return nullptr;
 }
 
 // helper method to create a new storage config based on static template and the response from access manager
@@ -83,6 +87,11 @@ std::shared_ptr<ChunkManager> CollectionChunkManager::GetCollectionIdChunkManage
     }
 
     auto response = GetNewCredentials(application_type, collection_id, instance_name, bucket_name, write_access);
+    if (!response) {
+        std::cerr << "Failed to get new credentials for collection ID: " << collection_id << std::endl;
+        return nullptr;
+    }
+
     auto updated_config = GetUpdatedStorageConfig(*response);
 
     auto chunk_manager = milvus::storage::CreateChunkManager(updated_config);
