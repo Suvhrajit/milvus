@@ -105,8 +105,6 @@ struct StorageConfig {
     std::string ToString() const {
         std::stringstream ss;
         ss << "[address=" << address << ", bucket_name=" << bucket_name
-           << ", access_key_id=" << access_key_id
-           << ", access_key_value=" << access_key_value
            << ", root_path=" << root_path << ", storage_type=" << storage_type
            << ", cloud_provider=" << cloud_provider
            << ", iam_endpoint=" << iam_endpoint << ", log_level=" << log_level
