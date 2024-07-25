@@ -24,6 +24,7 @@
 #include <aws/core/http/curl/CurlHttpClient.h>
 #include <aws/core/http/standard/StandardHttpRequest.h>
 #include <aws/core/utils/logging/FormattedLogSystem.h>
+#include <aws/core/utils/memory/stl/AWSString.h>
 #include <aws/s3/S3Client.h>
 #include <google/cloud/credentials.h>
 #include <google/cloud/internal/oauth2_credentials.h>
@@ -227,8 +228,8 @@ class MinioChunkManager : public ChunkManager {
                          const Aws::Client::ClientConfiguration& config);
 
     void
-    BuildAccessKeyAndSessionTokenClient(const StorageConfig& storage_config,
-                                        const Aws::Client::ClientConfiguration& config);
+    BuildByokS3Client(const StorageConfig& storage_config,
+                      const Aws::Client::ClientConfiguration& config);
 
     Aws::SDKOptions sdk_options_;
     static std::atomic<size_t> init_count_;
@@ -236,6 +237,7 @@ class MinioChunkManager : public ChunkManager {
     std::shared_ptr<Aws::S3::S3Client> client_;
     std::string default_bucket_name_;
     std::string remote_root_path_;
+    Aws::String aws_kms_key_id_;
 };
 
 class AwsChunkManager : public MinioChunkManager {

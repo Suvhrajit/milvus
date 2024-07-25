@@ -698,9 +698,9 @@ like the old password verification when updating the credential`,
 
 	p.ByokEnabled = ParamItem{
 		Key:          "common.byok.enabled",
-		Version:      "2.3.19",
+		Version:      "2.3.17",
 		DefaultValue: "false",
-		Doc:          "Whether to enable BYOK (Salesforce Data Cloud)",
+		Doc:          "Whether to enable BYOK",
 	}
 	p.ByokEnabled.Init(base.mgr)
 }

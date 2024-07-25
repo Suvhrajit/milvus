@@ -88,7 +88,7 @@ AwsChunkManager::AwsChunkManager(const StorageConfig& storage_config) {
 
     Aws::Client::ClientConfiguration config = generateConfig(storage_config);
     if (storage_config.byok_enabled) {
-        BuildAccessKeyAndSessionTokenClient(storage_config, config);
+        BuildByokS3Client(storage_config, config);
     } else if (storage_config.useIAM) {
         auto provider =
             std::make_shared<Aws::Auth::DefaultAWSCredentialsProviderChain>();
