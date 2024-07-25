@@ -122,7 +122,7 @@ CreateIndexV2(CIndex* res_index, CBuildIndexInfo c_build_index_info) {
 	if (build_index_info->storage_config.byok_enabled) {
             chunk_manager = milvus::storage::CollectionChunkManager::GetChunkManager(
                 build_index_info->collection_id,
-                "example_instance_name", // TODO: Get the right instance name
+                std::getenv("MILVUS_INSTANCE_NAME"),
                 true);
 	} else {
 	    chunk_manager = milvus::storage::CreateChunkManager(

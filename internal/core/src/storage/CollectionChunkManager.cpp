@@ -10,10 +10,10 @@ namespace milvus::storage {
 
 std::shared_ptr<milvus::dpccvsaccessmanager::DpcCvsAccessManagerClient> CollectionChunkManager::dpcCvsAccessManagerClient_ = nullptr;
 
-// static storage config template to be used to create new collection Id chunk managers
+// Static storage config template to be used to create new collection Id chunk managers
 StorageConfig CollectionChunkManager::storageConfigTemplate;
 
-// in-memory cache to store collection Id chunk managers with their expiration time
+// In-memory cache to store collection Id chunk managers with their expiration time
 std::unordered_map<int64_t, std::tuple<std::shared_ptr<ChunkManager>, std::chrono::system_clock::time_point>> CollectionChunkManager::chunkManagerMemoryCache;
 
 // Needs to be called in order for new chunk managers to be created. Called in storage_c.cpp.
@@ -22,7 +22,7 @@ void CollectionChunkManager::Init(const StorageConfig& config) {
     storageConfigTemplate = config;
 }
 
-// helper method to help determine is a chunk manager is still valid based on expiration date
+// Helper method to help determine is a chunk manager is still valid based on expiration date
 bool CollectionChunkManager::IsExpired(const std::chrono::system_clock::time_point& expiration) {
     bool expired = std::chrono::system_clock::now() > expiration;
     LOG_SEGCORE_INFO_ << "Checking if expiration time is expired: " << expired;
@@ -38,7 +38,7 @@ std::shared_ptr<milvus::dpccvsaccessmanager::DpcCvsAccessManagerClient> Collecti
     return dpcCvsAccessManagerClient_;
 }
 
-// helper method to manage the communication with access manager
+// Helper method to manage the communication with access manager
 std::shared_ptr<salesforce::cdp::dpccvsaccessmanager::v1::GetCredentialsResponse> CollectionChunkManager::GetNewCredentials(
     salesforce::cdp::dpccvsaccessmanager::v1::ApplicationType application_type,
     const int64_t collection_id,
@@ -60,7 +60,7 @@ std::shared_ptr<salesforce::cdp::dpccvsaccessmanager::v1::GetCredentialsResponse
     return nullptr;
 }
 
-// helper method to create a new storage config based on static template and the response from access manager
+// Helper method to create a new storage config based on static template and the response from access manager
 StorageConfig CollectionChunkManager::GetUpdatedStorageConfig(const salesforce::cdp::dpccvsaccessmanager::v1::GetCredentialsResponse& response) {
     StorageConfig updated_config = storageConfigTemplate;
 
@@ -81,7 +81,7 @@ std::chrono::system_clock::time_point CollectionChunkManager::ConvertToChronoTim
     return std::chrono::system_clock::from_time_t(std::mktime(&tm));
 }
 
-// the main method that is used to get or create the collection Id chunk manager
+// The main method that is used to get or create the collection Id chunk manager
 // called in the load_index_c.cpp
 std::shared_ptr<ChunkManager> CollectionChunkManager::GetChunkManager(
     const int64_t collection_id,
