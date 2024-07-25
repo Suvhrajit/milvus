@@ -117,14 +117,20 @@ CreateIndexV2(CIndex* res_index, CBuildIndexInfo c_build_index_info) {
                                               build_index_info->index_build_id,
                                               build_index_info->index_version};
 
-        auto chunk_manager = milvus::storage::CollectionChunkManager::GetCollectionIdChunkManager(
-            salesforce::cdp::dpccvsaccessmanager::v1::ApplicationType::MILVUS,
-            std::to_string(build_index_info->collection_id),
+		milvus::storage::ChunkManagerPtr chunk_manager;
+
+	if (build_index_info->storage_config.byok_enabled) {
+  	    chunk_manager = milvus::storage::CollectionChunkManager::GetCollectionIdChunkManager(
+            build_index_info->collection_id,
             "example_instance_name", // TODO: Get the right instance name
             true);
+	} else {
+	    chunk_manager = milvus::storage::CreateChunkManager(
+            build_index_info->storage_config);
+	}
 
         if (chunk_manager == nullptr) {
-            std::cerr << "Failed to get the remote chunk manager for collection ID: " << std::to_string(build_index_info->collection_id) << std::endl;
+            LOG_SEGCORE_ERROR_ << "Failed to get the chunk manager for collection ID: " << std::to_string(build_index_info->collection_id);
             auto status = CStatus();
             status.error_code = milvus::UnexpectedError;
             status.error_msg = "Failed to get the remote chunk manager.";

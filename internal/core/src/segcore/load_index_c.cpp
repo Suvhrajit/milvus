@@ -24,7 +24,6 @@
 #include "storage/FileManager.h"
 #include "segcore/Types.h"
 #include "storage/Util.h"
-#include "storage/RemoteChunkManagerSingleton.h"
 #include "storage/LocalChunkManagerSingleton.h"
 #include "storage/CollectionChunkManager.h"
 
@@ -143,9 +142,19 @@ appendVecIndex(CLoadIndexInfo c_load_index_info, CBinarySet c_binary_set) {
                                               load_index_info->field_id,
                                               load_index_info->index_build_id,
                                               load_index_info->index_version};
-        auto remote_chunk_manager =
-            milvus::storage::RemoteChunkManagerSingleton::GetInstance()
-                .GetRemoteChunkManager();
+
+        auto remote_chunk_manager = milvus::storage::CollectionChunkManager::GetCollectionIdChunkManager(
+            load_index_info->collection_id,
+            "example_instance_name", // TODO: Get the right instance name
+            true);
+
+        if (remote_chunk_manager == nullptr) {
+            LOG_SEGCORE_ERROR_ << "Failed to get the remote chunk manager for collection ID: " << std::to_string(load_index_info->collection_id);
+            auto status = CStatus();
+            status.error_code = milvus::UnexpectedError;
+            status.error_msg = "Failed to get the remote chunk manager.";
+            return status;
+        }
 
         auto config = milvus::index::ParseConfigFromIndexParams(
             load_index_info->index_params);
@@ -253,26 +262,19 @@ AppendIndexV2(CTraceContext c_trace, CLoadIndexInfo c_load_index_info) {
                                               load_index_info->field_id,
                                               load_index_info->index_build_id,
                                               load_index_info->index_version};
-        auto remote_chunk_manager =
-            milvus::storage::RemoteChunkManagerSingleton::GetInstance()
-                .GetRemoteChunkManager();
 
-        // TODO: need to make sure that the flag is available
-        // if (storage_config.byok_enabled) {
-            remote_chunk_manager = milvus::storage::CollectionChunkManager::GetCollectionIdChunkManager(
-                salesforce::cdp::dpccvsaccessmanager::v1::ApplicationType::MILVUS,
-                std::to_string(load_index_info->collection_id),
-                "example_instance_name", // TODO: Get the right instance name
-                true);
+        auto remote_chunk_manager = milvus::storage::CollectionChunkManager::GetCollectionIdChunkManager(
+            load_index_info->collection_id,
+            "example_instance_name", // TODO: Get the right instance name
+            true);
 
-            if (remote_chunk_manager == nullptr) {
-                std::cerr << "Failed to get the remote chunk manager for collection ID: " << load_index_info->collection_id << std::endl;
-                auto status = CStatus();
-                status.error_code = milvus::UnexpectedError;
-                status.error_msg = "Failed to get the remote chunk manager.";
-                return status;
-            }
-        // }
+        if (remote_chunk_manager == nullptr) {
+            LOG_SEGCORE_ERROR_ << "Failed to get the remote chunk manager for collection ID: " << std::to_string(load_index_info->collection_id);
+            auto status = CStatus();
+            status.error_code = milvus::UnexpectedError;
+            status.error_msg = "Failed to get the remote chunk manager.";
+            return status;
+        }
 
         auto config = milvus::index::ParseConfigFromIndexParams(
             load_index_info->index_params);

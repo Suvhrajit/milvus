@@ -100,7 +100,6 @@ struct StorageConfig {
     std::string session_token = "";
     std::string kms_key_id = "";
     bool byok_enabled = false;
-    std::string expiration_timestamp = "";
 
     std::string ToString() const {
         std::stringstream ss;

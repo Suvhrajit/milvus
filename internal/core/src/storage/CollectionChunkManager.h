@@ -18,20 +18,20 @@ class CollectionChunkManager {
 public:
     static void Init(const StorageConfig& config);
     static std::shared_ptr<ChunkManager> GetCollectionIdChunkManager(
-        salesforce::cdp::dpccvsaccessmanager::v1::ApplicationType application_type,
-        const std::string& collection_id,
+        const int64_t collection_id,
         const std::string& instance_name,
         bool write_access);
 
 private:
     static StorageConfig storageConfigTemplate;
-    static std::unordered_map<std::string, std::tuple<std::shared_ptr<ChunkManager>, std::chrono::system_clock::time_point>> chunkManagerMemoryCache;
-
+    static std::shared_ptr<milvus::dpccvsaccessmanager::DpcCvsAccessManagerClient> GetDpcCvsAccessManagerClient();
+    static std::shared_ptr<milvus::dpccvsaccessmanager::DpcCvsAccessManagerClient> dpcCvsAccessManagerClient_;
+    static std::unordered_map<int64_t, std::tuple<std::shared_ptr<ChunkManager>, std::chrono::system_clock::time_point>> chunkManagerMemoryCache;
     static bool IsExpired(const std::chrono::system_clock::time_point& expiration);
     static StorageConfig GetUpdatedStorageConfig(const salesforce::cdp::dpccvsaccessmanager::v1::GetCredentialsResponse& response);
     static std::shared_ptr<salesforce::cdp::dpccvsaccessmanager::v1::GetCredentialsResponse> GetNewCredentials(
         salesforce::cdp::dpccvsaccessmanager::v1::ApplicationType application_type,
-        const std::string& collection_id,
+        const int64_t collection_id,
         const std::string& instance_name,
         const std::string& bucket_name,
         bool write_access);
