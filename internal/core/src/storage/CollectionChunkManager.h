@@ -17,7 +17,7 @@ namespace milvus::storage {
 class CollectionChunkManager {
 public:
     static void Init(const StorageConfig& config);
-    static std::shared_ptr<ChunkManager> GetCollectionIdChunkManager(
+    static std::shared_ptr<ChunkManager> GetChunkManager(
         const int64_t collection_id,
         const std::string& instance_name,
         bool write_access);

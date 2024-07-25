@@ -143,7 +143,7 @@ appendVecIndex(CLoadIndexInfo c_load_index_info, CBinarySet c_binary_set) {
                                               load_index_info->index_build_id,
                                               load_index_info->index_version};
 
-        auto remote_chunk_manager = milvus::storage::CollectionChunkManager::GetCollectionIdChunkManager(
+        auto remote_chunk_manager = milvus::storage::CollectionChunkManager::GetChunkManager(
             load_index_info->collection_id,
             "example_instance_name", // TODO: Get the right instance name
             true);
@@ -263,7 +263,7 @@ AppendIndexV2(CTraceContext c_trace, CLoadIndexInfo c_load_index_info) {
                                               load_index_info->index_build_id,
                                               load_index_info->index_version};
 
-        auto remote_chunk_manager = milvus::storage::CollectionChunkManager::GetCollectionIdChunkManager(
+        auto remote_chunk_manager = milvus::storage::CollectionChunkManager::GetChunkManager(
             load_index_info->collection_id,
             "example_instance_name", // TODO: Get the right instance name
             true);

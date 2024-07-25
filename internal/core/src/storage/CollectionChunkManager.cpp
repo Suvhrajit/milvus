@@ -83,7 +83,7 @@ std::chrono::system_clock::time_point CollectionChunkManager::ConvertToChronoTim
 
 // the main method that is used to get or create the collection Id chunk manager
 // called in the load_index_c.cpp
-std::shared_ptr<ChunkManager> CollectionChunkManager::GetCollectionIdChunkManager(
+std::shared_ptr<ChunkManager> CollectionChunkManager::GetChunkManager(
     const int64_t collection_id,
     const std::string& instance_name,
     bool write_access) {

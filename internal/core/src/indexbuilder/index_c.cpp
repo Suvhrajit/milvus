@@ -117,13 +117,13 @@ CreateIndexV2(CIndex* res_index, CBuildIndexInfo c_build_index_info) {
                                               build_index_info->index_build_id,
                                               build_index_info->index_version};
 
-		milvus::storage::ChunkManagerPtr chunk_manager;
+        milvus::storage::ChunkManagerPtr chunk_manager;
 
 	if (build_index_info->storage_config.byok_enabled) {
-  	    chunk_manager = milvus::storage::CollectionChunkManager::GetCollectionIdChunkManager(
-            build_index_info->collection_id,
-            "example_instance_name", // TODO: Get the right instance name
-            true);
+            chunk_manager = milvus::storage::CollectionChunkManager::GetChunkManager(
+                build_index_info->collection_id,
+                "example_instance_name", // TODO: Get the right instance name
+                true);
 	} else {
 	    chunk_manager = milvus::storage::CreateChunkManager(
             build_index_info->storage_config);
@@ -137,7 +137,7 @@ CreateIndexV2(CIndex* res_index, CBuildIndexInfo c_build_index_info) {
             return status;
         }
 
-        // TODO: build_index_info->storage_config would not have the latest creds as GetCollectionIdChunkManager updates the storage_config locally. Need to check if this will have implications.
+        // TODO: build_index_info->storage_config would not have the latest creds as GetChunkManager updates the storage_config locally. Need to check if this will have implications.
 
         milvus::storage::FileManagerContext fileManagerContext(
             field_meta, index_meta, chunk_manager);

@@ -101,7 +101,8 @@ struct StorageConfig {
     std::string kms_key_id = "";
     bool byok_enabled = false;
 
-    std::string ToString() const {
+    std::string
+    ToString() const {
         std::stringstream ss;
         ss << "[address=" << address << ", bucket_name=" << bucket_name
            << ", root_path=" << root_path << ", storage_type=" << storage_type

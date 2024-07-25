@@ -13,7 +13,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
+#include "log/Log.h"
 #include "storage/storage_c.h"
 #include "storage/prometheus_client.h"
 #include "storage/RemoteChunkManagerSingleton.h"
@@ -77,9 +77,9 @@ InitRemoteChunkManagerSingleton(CStorageConfig c_storage_config) {
         storage_config.requestTimeoutMs = c_storage_config.requestTimeoutMs;
         storage_config.byok_enabled = c_storage_config.byok_enabled;
 
-		// need to make sure that the flag is available
         if (storage_config.byok_enabled) {
-		    milvus::storage::CollectionChunkManager::Init(storage_config);
+            LOG_SEGCORE_INFO_ << "BYOK Enabled flas is set";
+	    milvus::storage::CollectionChunkManager::Init(storage_config);
         } else {
             milvus::storage::RemoteChunkManagerSingleton::GetInstance().Init(
                 storage_config);
