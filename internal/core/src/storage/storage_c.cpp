@@ -13,10 +13,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
+#include "log/Log.h"
 #include "storage/storage_c.h"
 #include "storage/prometheus_client.h"
 #include "storage/RemoteChunkManagerSingleton.h"
+#include "storage/CollectionChunkManager.h"
 #include "storage/LocalChunkManagerSingleton.h"
 #include "storage/ChunkCacheSingleton.h"
 
@@ -74,8 +75,28 @@ InitRemoteChunkManagerSingleton(CStorageConfig c_storage_config) {
         storage_config.useVirtualHost = c_storage_config.useVirtualHost;
         storage_config.region = c_storage_config.region;
         storage_config.requestTimeoutMs = c_storage_config.requestTimeoutMs;
-        milvus::storage::RemoteChunkManagerSingleton::GetInstance().Init(
-            storage_config);
+        storage_config.byok_enabled = c_storage_config.byok_enabled;
+
+        if (storage_config.byok_enabled) {
+            const char* instance_name_env = std::getenv("MILVUS_INSTANCE_NAME");
+            std::string instance_name;
+
+            if (instance_name_env) {
+                instance_name = std::string(instance_name_env);
+            } else {
+                LOG_SEGCORE_ERROR_ << "Environment variable INSTANCE_NAME not set." << std::endl;
+                auto status = CStatus();
+                status.error_code = milvus::UnexpectedError;
+                status.error_msg = "Environment variable INSTANCE_NAME not set.";
+                return status;
+            }
+            LOG_SEGCORE_INFO_ << "BYOK Enabled flag is set";
+	    milvus::storage::CollectionChunkManager::Init(storage_config);
+
+        } else {
+            milvus::storage::RemoteChunkManagerSingleton::GetInstance().Init(
+                storage_config);
+        }
 
         return milvus::SuccessCStatus();
     } catch (std::exception& e) {

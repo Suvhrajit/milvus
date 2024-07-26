@@ -115,7 +115,6 @@ struct StorageConfig {
            << ", requestTimeoutMs=" << requestTimeoutMs
            << ", kms_key_id=" << kms_key_id
            << ", byok_enabled=" << std::boolalpha << byok_enabled << "]";
-
         return ss.str();
     }
 };
