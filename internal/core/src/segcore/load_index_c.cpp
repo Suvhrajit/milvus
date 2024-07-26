@@ -149,7 +149,7 @@ appendVecIndex(CLoadIndexInfo c_load_index_info, CBinarySet c_binary_set) {
             true);
 
         if (remote_chunk_manager == nullptr) {
-            LOG_SEGCORE_ERROR_ << "Failed to get the remote chunk manager for collection ID: " << std::to_string(load_index_info->collection_id);
+            LOG_SEGCORE_ERROR_ << "Failed to get the remote chunk manager for collection ID: " << load_index_info->collection_id;
             auto status = CStatus();
             status.error_code = milvus::UnexpectedError;
             status.error_msg = "Failed to get the remote chunk manager.";
@@ -269,7 +269,7 @@ AppendIndexV2(CTraceContext c_trace, CLoadIndexInfo c_load_index_info) {
             true);
 
         if (remote_chunk_manager == nullptr) {
-            LOG_SEGCORE_ERROR_ << "Failed to get the remote chunk manager for collection ID: " << std::to_string(load_index_info->collection_id);
+            LOG_SEGCORE_ERROR_ << "Failed to get the remote chunk manager for collection ID: " << load_index_info->collection_id;
             auto status = CStatus();
             status.error_code = milvus::UnexpectedError;
             status.error_msg = "Failed to get the remote chunk manager.";

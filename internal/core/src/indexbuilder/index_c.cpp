@@ -130,7 +130,7 @@ CreateIndexV2(CIndex* res_index, CBuildIndexInfo c_build_index_info) {
 	}
 
         if (chunk_manager == nullptr) {
-            LOG_SEGCORE_ERROR_ << "Failed to get the chunk manager for collection ID: " << std::to_string(build_index_info->collection_id);
+            LOG_SEGCORE_ERROR_ << "Failed to get the chunk manager for collection ID: " << build_index_info->collection_id;
             auto status = CStatus();
             status.error_code = milvus::UnexpectedError;
             status.error_msg = "Failed to get the remote chunk manager.";
