@@ -88,8 +88,8 @@ std::shared_ptr<ChunkManager> CollectionChunkManager::GetChunkManager(
     const std::string& instance_name,
     bool write_access) {
 
-    if (storageConfigTemplate.byok_enabled) {
-        LOG_SEGCORE_INFO_ << "BYOK enabled, using RemoteChunkManagerSingleton.";
+    if (!storageConfigTemplate.byok_enabled) {
+        LOG_SEGCORE_INFO_ << "BYOK not enabled, using RemoteChunkManagerSingleton.";
         return milvus::storage::RemoteChunkManagerSingleton::GetInstance()
                 .GetRemoteChunkManager();
     }
