@@ -26,6 +26,7 @@
 #include "pb/index_cgo_msg.pb.h"
 #include "storage/Util.h"
 #include "index/Meta.h"
+#include "dpccvsaccessmanager/DpcCvsAccessManagerClient.h"
 
 using namespace milvus;
 CStatus
