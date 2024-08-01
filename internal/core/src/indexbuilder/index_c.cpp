@@ -77,6 +77,7 @@ CreateIndex(enum CDataType dtype,
 CStatus
 CreateIndexV2(CIndex* res_index, CBuildIndexInfo c_build_index_info) {
     try {
+
         auto build_index_info = (BuildIndexInfo*)c_build_index_info;
         auto field_type = build_index_info->field_type;
 
@@ -338,6 +339,7 @@ NewBuildIndexInfo(CBuildIndexInfo* c_build_index_info,
         storage_config.region = c_storage_config.region;
         storage_config.useVirtualHost = c_storage_config.useVirtualHost;
         storage_config.requestTimeoutMs = c_storage_config.requestTimeoutMs;
+        storage_config.byok_enabled = c_storage_config.byok_enabled;
 
         *c_build_index_info = build_index_info.release();
         auto status = CStatus();
