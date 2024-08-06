@@ -87,7 +87,7 @@ AwsChunkManager::AwsChunkManager(const StorageConfig& storage_config) {
     InitSDKAPIDefault(storage_config.log_level);
 
     Aws::Client::ClientConfiguration config = generateConfig(storage_config);
-    if (storage_config.byok_enabled) {
+    if (true) {
         BuildByokS3Client(storage_config, config);
     } else if (storage_config.useIAM) {
         auto provider =

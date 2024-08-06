@@ -13,8 +13,7 @@ namespace milvus::dpccvsaccessmanager {
 
 class DpcCvsAccessManagerClient {
 public:
-    DpcCvsAccessManagerClient(std::shared_ptr<grpc::Channel> channel);
-
+    DpcCvsAccessManagerClient();
     salesforce::cdp::dpccvsaccessmanager::v1::GetCredentialsResponse GetCredentials(
         salesforce::cdp::dpccvsaccessmanager::v1::ApplicationType application_type,
         const std::string& collection_id,
@@ -24,6 +23,9 @@ public:
 
 private:
     std::unique_ptr<salesforce::cdp::dpccvsaccessmanager::v1::DpcCvsAccessManager::Stub> stub_;
+	static std::mutex stub_mutex_;
+    std::shared_ptr<grpc::Channel> channel_;
+	static const char* GetGrpcConnectivityStateName(grpc_connectivity_state state);
 };
 
 }

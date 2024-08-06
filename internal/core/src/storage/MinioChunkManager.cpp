@@ -228,7 +228,7 @@ MinioChunkManager::PreCheck(const StorageConfig& config) {
                       << config.ToString();
     try {
         // Just test connection not check real list, avoid cost resource.
-        ListWithPrefix("justforconnectioncheck");
+        ListWithPrefix("suv_milvus");
     } catch (SegcoreError& e) {
         auto err_message = fmt::format(
             "precheck chunk manager client failed, "
@@ -265,7 +265,7 @@ void
 MinioChunkManager::BuildByokS3Client(
     const StorageConfig& storage_config,
     const Aws::Client::ClientConfiguration& config) {
-    LOG_SEGCORE_INFO_ << "Building BYOK S3 Client in MinioChunkManager";
+    LOG_SEGCORE_INFO_ << "gsriram: Building BYOK S3 Client in MinioChunkManager";
 
     AssertInfo(!storage_config.access_key_id.empty(),
            "if not use iam, access key should not be empty");
@@ -285,7 +285,7 @@ MinioChunkManager::BuildByokS3Client(
 
     if (!storage_config.kms_key_id.empty()) {
         aws_kms_key_id_ = ConvertToAwsString(storage_config.kms_key_id);
-        LOG_SEGCORE_INFO_ << "Set AWS SSE KMS Key ID in MinioChunkManager: "
+        LOG_SEGCORE_INFO_ << "gsriram: Set AWS SSE KMS Key ID in MinioChunkManager: "
                           << aws_kms_key_id_;
     }
 }

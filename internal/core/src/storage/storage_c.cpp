@@ -76,24 +76,24 @@ InitRemoteChunkManagerSingleton(CStorageConfig c_storage_config) {
         storage_config.region = c_storage_config.region;
         storage_config.requestTimeoutMs = c_storage_config.requestTimeoutMs;
         storage_config.byok_enabled = c_storage_config.byok_enabled;
-
         if (storage_config.byok_enabled) {
             const char* instance_name_env = std::getenv("MILVUS_INSTANCE_NAME");
             std::string instance_name;
 
             if (instance_name_env) {
                 instance_name = std::string(instance_name_env);
+                LOG_SEGCORE_INFO_ << "gsriram: MILVUS_INSTANCE_NAME -> " << instance_name;
             } else {
-                LOG_SEGCORE_ERROR_ << "Environment variable INSTANCE_NAME not set." << std::endl;
+                LOG_SEGCORE_ERROR_ << "gsriram: Environment variable MILVUS_INSTANCE_NAME not set." << std::endl;
                 auto status = CStatus();
                 status.error_code = milvus::UnexpectedError;
                 status.error_msg = "Environment variable INSTANCE_NAME not set.";
                 return status;
             }
-            LOG_SEGCORE_INFO_ << "BYOK Enabled flag is set";
+            LOG_SEGCORE_INFO_ << "gsriram: BYOK Enabled flag is enabled -> storage_c.cpp";
 	    milvus::storage::CollectionChunkManager::Init(storage_config);
-
         } else {
+            LOG_SEGCORE_INFO_ << "gsriram: BYOK Enabled flag is disabled -> storage_c.cpp";
             milvus::storage::RemoteChunkManagerSingleton::GetInstance().Init(
                 storage_config);
         }

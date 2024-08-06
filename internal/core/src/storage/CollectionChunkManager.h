@@ -21,7 +21,6 @@ public:
         const int64_t collection_id,
         const std::string& instance_name,
         bool write_access);
-
 private:
     static StorageConfig storageConfigTemplate;
     static std::shared_ptr<milvus::dpccvsaccessmanager::DpcCvsAccessManagerClient> GetDpcCvsAccessManagerClient();
@@ -37,6 +36,7 @@ private:
         bool write_access);
 
     static std::chrono::system_clock::time_point ConvertToChronoTime(const std::string& time_str);
+    static std::mutex client_mutex_;
 };
 
 } // namespace milvus::storage

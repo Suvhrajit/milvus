@@ -150,10 +150,10 @@ func newMinioClient(ctx context.Context, c *config) (*minio.Client, error) {
 		}
 		return nil
 	}
-	err = retry.Do(ctx, checkBucketFn, retry.Attempts(CheckBucketRetryAttempts))
-	if err != nil {
-		return nil, err
-	}
+	_ = retry.Do(ctx, checkBucketFn, retry.Attempts(CheckBucketRetryAttempts))
+	//if err != nil {
+	//	return nil, err
+	//}
 	return minIOClient, nil
 }
 

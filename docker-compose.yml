@@ -47,6 +47,14 @@ services:
     command: &builder-command >
       /bin/bash -c "
         make check-proto-product && make verifiers && make unittest"
+    deploy:
+      resources:
+        limits:
+          cpus: '10'
+          memory: 32G
+        reservations:
+          cpus: '10'
+          memory: 32G
 
   gpubuilder:
     image: ${IMAGE_REPO}/milvus-env:gpu-${OS_NAME}-${GPU_DATE_VERSION}
